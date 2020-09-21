@@ -25,6 +25,17 @@ BLEAdvertising *PhyphoxBLE::myAdvertising;
 TaskHandle_t PhyphoxBLE::TaskTransfer;
 uint8_t* PhyphoxBLE::data;
 
+uint16_t PhyphoxBLE::minConInterval = 6;  //7.5ms
+uint16_t PhyphoxBLE::maxConInterval = 24; //30ms
+uint16_t PhyphoxBLE::slaveLatency = 0;
+uint16_t PhyphoxBLE::timeout = 10;
+
+class MyServerCallbacks: public BLEServerCallbacks {
+    void onConnect(BLEServer* pServer, esp_ble_gatts_cb_param_t *param) {
+        pServer->updateConnParams(param->connect.remote_bda,PhyphoxBLE::minConInterval,PhyphoxBLE::maxConInterval,PhyphoxBLE::slaveLatency,PhyphoxBLE::timeout);
+    };
+};
+
 class MyExpCallback: public BLEDescriptorCallbacks {
 
     public:
@@ -96,8 +107,10 @@ void PhyphoxBLE::start(const char * DEVICE_NAME)
     }
 
 	BLEDevice::init(DEVICE_NAME);
-	myServer = BLEDevice::createServer();
+  
 
+	myServer = BLEDevice::createServer();
+  myServer->setCallbacks(new MyServerCallbacks());
 	phyphoxExperimentService = myServer->createService(phyphoxBleExperimentServiceUUID);
 
   experimentCharacteristic = phyphoxExperimentService->createCharacteristic(
