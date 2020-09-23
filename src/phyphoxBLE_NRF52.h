@@ -110,7 +110,9 @@ class PhyphoxBLE
 	static inline uint16_t minConInterval = 6;	//7.5ms
 	static inline uint16_t maxConInterval = 24; //30ms
 	static inline uint16_t slaveLatency = 0;
-	static inline uint16_t timeout = 10;	
+	static inline uint16_t timeout = 10;
+
+	static inline uint16_t currentConnections =0;	
 
 	static void (*configHandler)();
 	static inline Gap::ConnectionParams_t conParameters; 
