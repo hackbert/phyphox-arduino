@@ -51,6 +51,13 @@ void setup()
    firstView.addElement(firstGraph);            //attach graph to view
    firstView.addElement(secondGraph);            //attach second graph to view
    plotRandomValues.addView(firstView);         //Attach view to experiment
+
+   //Define channels and labels to be exported by phyphox if the user uses the export function
+   //If you do not ever call "setChannelForExport" the export configuration is auto-detected from the channels assigned by "setChannel" calls for graphs
+   plotRandomValues.setChannelForExport(0, "Time (s)");
+   plotRandomValues.setChannelForExport(1, "Random number");
+   plotRandomValues.setChannelForExport(2, "Squared random number");
+
    PhyphoxBLE::addExperiment(plotRandomValues);      //Attach experiment to server
 
 }
