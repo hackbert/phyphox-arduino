@@ -1,5 +1,8 @@
 #include <phyphoxBle.h> 
 
+//This example shows how to set advanced parameters for the Bluetooth Low Energy communication. Usually, it is not neccessary to specifically set any of these unless you need to optimize for very demanding use cases.
+//Note that not all parameters are supported on every architecture and might just be ignored.
+
 void setup() {
     /*
     Minimum interval between two connection events allowed for a connection.
