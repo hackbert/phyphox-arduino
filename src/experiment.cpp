@@ -26,7 +26,40 @@ void PhyphoxBleExperiment::setDescription(const char *d){
 	strcat(DESCRIPTION, d);
 }
 
+void PhyphoxBleExperiment::setChannelForExport(int channel, char* label) {
+    for (int i = 0; i < 6; i++) {
+		if (exportConfiguration[i] == nullptr) {
+            exportConfiguration[i] = new ExportChannel();
+            exportConfiguration[i]->channel = channel;
+            strcpy(exportConfiguration[i]->label, label);
+            return;
+		}
+	}
+}
+
+void PhyphoxBleExperiment::autoDetectExportChannels() {
+    for (int channel = 0; channel <= 5; channel++) {
+        bool inUse = false;
+        for (int i = 0; i < phyphoxBleNViews; i++){
+	        inUse |= (VIEWS[i] != nullptr && VIEWS[i]->usesChannel(channel));
+        }
+        if (inUse) {
+		    char label[9];
+            if (channel == 0)
+	            sprintf(label, "time (s)");
+            else
+	            sprintf(label, "CH%i", channel);
+            setChannelForExport(channel, label);
+        }
+    }
+}
+
 void PhyphoxBleExperiment::getBytes(char *buffArray){
+    //If no export configuration has been set by the user, we need to infer the used channels from the grpah configuration
+    if (exportConfiguration[0] == nullptr) {
+        autoDetectExportChannels();
+    }
+
 	//header
 	strcat(buffArray, "<phyphox version=\"1.10\">\n");
 	//build title
@@ -83,7 +116,17 @@ void PhyphoxBleExperiment::getBytes(char *buffArray){
 	strcat(buffArray,"</views>\n");
 
 	//build export
-	strcat(buffArray, "<export></export>\n");
+	strcat(buffArray, "<export>\n");
+	strcat(buffArray, "<set name=\"raw\">\n");
+	for (int i = 0; i < 6; i++) {
+		if (exportConfiguration[i] != nullptr) {
+			char dataLine[60];
+		    sprintf(dataLine, "<data name=\"%s\">CH%i</data>\n", exportConfiguration[i]->label, exportConfiguration[i]->channel);
+        	strcat(buffArray, dataLine);
+		}
+	}
+	strcat(buffArray, "</set>\n");
+	strcat(buffArray, "</export>\n");
 	
 	//close
 	strcat(buffArray, "</phyphox>");

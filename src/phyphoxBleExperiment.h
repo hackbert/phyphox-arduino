@@ -29,7 +29,7 @@ class PhyphoxBleExperiment {
 
 		    void setLabel(const char*);
 		    virtual void getBytes(char*);
-
+            virtual bool usesChannel(int);
 	    private:
 
 
@@ -48,8 +48,8 @@ class PhyphoxBleExperiment {
 	    char LABELX[50] = "time";
 	    char LABELY[50] = "value";
 
-	    char INPUTX[5] = "CH0";
-	    char INPUTY[5] = "CH1";
+	    int INPUTX = 0;
+	    int INPUTY = 1;
 
 	    char STYLE[8] = "lines";
 
@@ -62,6 +62,7 @@ class PhyphoxBleExperiment {
 
 	    void phyphoxTimestamp();
 	    void getBytes(char*);
+        bool usesChannel(int);
 	    private:
 
 
@@ -80,6 +81,8 @@ class PhyphoxBleExperiment {
 	    void getBytes(char*);
 	    void addElement(Element&);
 
+        bool usesChannel(int);
+
 	    char LABEL[50] = "Data";
 	    Element *ELEMENTS[phyphoxBleNViews]={nullptr};
 	    private: 
@@ -92,13 +95,19 @@ class PhyphoxBleExperiment {
 	void getBytes(char*);
 	void addView(View&);
 
-
 	char TITLE[50] = "Arduino-Experiment";
 	char CATEGORY[50] = "Arduino Experiments";
 	char DESCRIPTION[500] = "An experiment created with the phyphox BLE library for Arduino-compatible micro controllers.";
 
 	View *VIEWS[phyphoxBleNViews] = {nullptr};
 
+    void setChannelForExport(int, char*);
+    void autoDetectExportChannels();
+    typedef struct {
+        int channel;
+        char label[30];
+    } ExportChannel;
+    ExportChannel *exportConfiguration[6] = {nullptr};
 };
 
 #endif

@@ -45,13 +45,16 @@ class PhyphoxBLE
 
         static void read(uint8_t*, unsigned int);
         static void read(float&);
-        
-        
 
         static void poll();
         static void poll(int timeout);
 
         static void(*configHandler)();
+
+        static uint16_t minConInterval;
+        static uint16_t maxConInterval;
+        static uint16_t slaveLatency;
+        static uint16_t timeout;
         
 };
 

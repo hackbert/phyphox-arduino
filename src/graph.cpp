@@ -22,8 +22,8 @@ void PhyphoxBleExperiment::Graph::setLabelY(const char *ly){
 
 void PhyphoxBleExperiment::Graph::setChannel(int x, int y)
 {
-	sprintf(INPUTX, "CH%i", x);
-	sprintf(INPUTY, "CH%i", y);
+    INPUTX = x;
+    INPUTY = y;
 }
 
 void PhyphoxBleExperiment::Graph::setStyle(const char *s){
@@ -33,8 +33,6 @@ void PhyphoxBleExperiment::Graph::setStyle(const char *s){
 
 void PhyphoxBleExperiment::Graph::getBytes(char *buffArray)
 {
-	
-
 
 	strcat(buffArray,"\t\t<graph label=\"");
 	strcat(buffArray, LABEL);
@@ -50,11 +48,19 @@ void PhyphoxBleExperiment::Graph::getBytes(char *buffArray)
 	strcat(buffArray,STYLE);
 	strcat(buffArray,"\">\n");
 
+    char cINPUTX[5], cINPUTY[5];
+	sprintf(cINPUTX, "CH%i", INPUTX);
+	sprintf(cINPUTY, "CH%i", INPUTY);
+
 	strcat(buffArray, "\t\t\t<input axis=\"x\">");
-	strcat(buffArray, INPUTX);
+	strcat(buffArray, cINPUTX);
 	strcat(buffArray, "</input>\n\t\t\t<input axis=\"y\">");
-	strcat(buffArray, INPUTY);
+	strcat(buffArray, cINPUTY);
 	strcat(buffArray, "</input>\n\t\t</graph>\n");
 
 	
+}
+
+bool PhyphoxBleExperiment::Graph::usesChannel(int channel) {
+    return INPUTX == channel || INPUTY == channel;
 }

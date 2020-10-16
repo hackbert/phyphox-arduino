@@ -68,6 +68,11 @@ class PhyphoxBLE
         static void startTask();
         static void staticStartTask(void*);
 
+        static uint16_t minConInterval;
+        static uint16_t maxConInterval;
+        static uint16_t slaveLatency;
+        static uint16_t timeout;
+
 };
 
 

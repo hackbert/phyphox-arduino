@@ -56,10 +56,12 @@ void PhyphoxBleEventHandler::onDisconnectionComplete(const ble::DisconnectionCom
 	//	printer -> println("Disconnection");
 	//#endif
 	ble.gap().startAdvertising(ble::LEGACY_ADVERTISING_HANDLE);
+	PhyphoxBLE::currentConnections-=1;
 }
 
 void PhyphoxBleEventHandler::onConnectionComplete(const ble::ConnectionCompleteEvent &event)
 {
+	PhyphoxBLE::currentConnections+=1;
 	//#ifndef NDEBUG
 	//if(printer)
 	//	printer -> println("Connection with device");
@@ -106,6 +108,17 @@ void PhyphoxBLE::when_subscription_received(GattAttribute::Handle_t handle)
 	//after experiment has been transfered start advertising again
 	ble.gap().startAdvertising(ble::LEGACY_ADVERTISING_HANDLE);
 
+}
+void PhyphoxBLE::when_connected(const Gap::ConnectionCallbackParams_t *params)
+{
+
+	//ble.gap().updateConnectionParams(params->handle, &conParameters);
+	ble.gap().updateConnectionParameters(params->handle,
+                                    ble::conn_interval_t(ble::conn_interval_t(minConInterval)),
+                                    ble::conn_interval_t(ble::conn_interval_t(maxConInterval)),
+                                    ble::slave_latency_t(slaveLatency),
+                                   ble::supervision_timeout_t(ble::supervision_timeout_t(timeout)));
+                                    
 }
 void PhyphoxBLE::configReceived(const GattWriteCallbackParams *params)
 {
@@ -175,6 +188,7 @@ void PhyphoxBLE::bleInitComplete(BLE::InitializationCompleteCallbackContext* par
 	ble.gattServer().onUpdatesEnabled(PhyphoxBLE::when_subscription_received);
 	ble.gattServer().onDataWritten(PhyphoxBLE::configReceived);
 	ble.gap().setEventHandler(&PhyphoxBLE::eventHandler);
+    ble.gap().onConnection(PhyphoxBLE::when_connected);
 
 	uint8_t _adv_buffer[ble::LEGACY_ADVERTISING_MAX_SIZE];
 	ble::AdvertisingDataBuilder adv_data_builder(_adv_buffer);
@@ -202,6 +216,15 @@ void PhyphoxBLE::bleInitComplete(BLE::InitializationCompleteCallbackContext* par
 	#ifndef NDEBUG
 	output("in init");
 	#endif
+
+	ble.gap().getPreferredConnectionParams(&conParameters);
+    conParameters.minConnectionInterval = minConInterval;
+    conParameters.maxConnectionInterval = maxConInterval;
+	conParameters.slaveLatency = slaveLatency;
+	conParameters.connectionSupervisionTimeout = timeout;
+
+    ble.gap().setPreferredConnectionParams(&conParameters);
+
 }
 
 void PhyphoxBLE::start(const char* DEVICE_NAME, uint8_t* exp_pointer, size_t len)

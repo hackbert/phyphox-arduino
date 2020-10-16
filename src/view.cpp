@@ -36,4 +36,13 @@ void PhyphoxBleExperiment::View::getBytes(char *buffArray)
 
 }
 
-
+bool PhyphoxBleExperiment::View::usesChannel(int channel) {
+	for(int i=0; i<phyphoxBleNElements; i++){
+		if(ELEMENTS[i]!=nullptr){
+			if (ELEMENTS[i]->usesChannel(channel)) {
+                return true;
+            }
+		}
+	}
+    return false;
+}

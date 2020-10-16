@@ -107,7 +107,15 @@ class PhyphoxBLE
 	static uint8_t EXPARRAY[4096];// block some storage
 	static size_t expLen; //try o avoid this maybe use std::array or std::vector
 
+	static inline uint16_t minConInterval = 6;	//7.5ms
+	static inline uint16_t maxConInterval = 24; //30ms
+	static inline uint16_t slaveLatency = 0;
+	static inline uint16_t timeout = 10;
+
+	static inline uint16_t currentConnections =0;	
+
 	static void (*configHandler)();
+	static inline Gap::ConnectionParams_t conParameters; 
 
     static void poll();
     static void poll(int timeout);
