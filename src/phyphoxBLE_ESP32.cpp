@@ -222,6 +222,8 @@ void PhyphoxBLE::write(float& f1, float& f2, float& f3, float& f4, float& f5)
 }
 
 void PhyphoxBLE::write(uint8_t *arrayPointer, unsigned int arraySize)
+{
+
   dataCharacteristic->setValue(arrayPointer,arraySize);
   dataCharacteristic->notify();
 }
