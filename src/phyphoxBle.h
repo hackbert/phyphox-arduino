@@ -7,6 +7,8 @@ static const char *phyphoxBleExperimentControlCharacteristicUUID = "cddf0003-30f
 
 static const char *phyphoxBleDataServiceUUID = "cddf1001-30f7-4671-8b43-5e40ba53514a";
 static const char *phyphoxBleDataCharacteristicUUID = "cddf1002-30f7-4671-8b43-5e40ba53514a";
+static const char *phyphoxBleData1CharacteristicUUID = "cddf1004-30f7-4671-8b43-5e40ba53514a";
+static const char *phyphoxBleData2CharacteristicUUID = "cddf1005-30f7-4671-8b43-5e40ba53514a";
 static const char *phyphoxBleConfigCharacteristicUUID = "cddf1003-30f7-4671-8b43-5e40ba53514a";
 
 
@@ -34,10 +36,10 @@ struct phyphoxBleCrc32
     static void generate_table(uint32_t(&table)[256])
     {
         uint32_t polynomial = 0xEDB88320;
-        for (uint32_t i = 0; i < 256; i++) 
+        for (uint32_t i = 0; i < 256; i++)
         {
             uint32_t c = i;
-            for (size_t j = 0; j < 8; j++) 
+            for (size_t j = 0; j < 8; j++)
             {
                 if (c & 1) {
                     c = polynomial ^ (c >> 1);
@@ -54,7 +56,7 @@ struct phyphoxBleCrc32
     {
         uint32_t c = initial ^ 0xFFFFFFFF;
         const uint8_t* u = static_cast<const uint8_t*>(buf);
-        for (size_t i = 0; i < len; ++i) 
+        for (size_t i = 0; i < len; ++i)
         {
             c = table[(c ^ u[i]) & 0xFF] ^ (c >> 8);
         }

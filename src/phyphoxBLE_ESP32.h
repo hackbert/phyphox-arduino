@@ -8,7 +8,7 @@
 #include <BLEServer.h>
 #include <esp_system.h>
 #include <BLE2902.h>
-#include "phyphoxBleExperiment.h"	
+#include "phyphoxBleExperiment.h"
 
 using std::copy;
 
@@ -24,8 +24,13 @@ class PhyphoxBLE
         static BLEService *phyphoxExperimentService;
         static BLEDescriptor *myExperimentDescriptor;
         static BLEDescriptor *myDataDescriptor;
+        static BLEDescriptor *myData1Descriptor;
+        static BLEDescriptor *myData2Descriptor;
+        static BLEDescriptor *myData3Descriptor;
         static BLEDescriptor *myConfigDescriptor;
         static BLECharacteristic *dataCharacteristic;
+        static BLECharacteristic *data1Characteristic;
+        static BLECharacteristic *data2Characteristic;
         static BLECharacteristic *experimentCharacteristic;
         static BLECharacteristic *configCharacteristic;
         static BLEAdvertising *myAdvertising;
@@ -43,9 +48,9 @@ class PhyphoxBLE
 
     public:
 
-        static void start(const char* DEVICE_NAME, uint8_t* p, size_t n = 0); 
+        static void start(const char* DEVICE_NAME, uint8_t* p, size_t n = 0);
         static void start(const char* DEVICE_NAME);
-        static void start(uint8_t* p, size_t n = 0); 
+        static void start(uint8_t* p, size_t n = 0);
         static void start();
 
         static void when_subscription_received();
@@ -59,6 +64,8 @@ class PhyphoxBLE
         static void write(float&, float&, float&);
         static void write(float&, float&, float&, float&);
         static void write(float&, float&, float&, float&, float&);
+        static void write(float&, float&, float&, float&, float&, float&, float&, float&, float&, float&);
+        static void write(float&, float&, float&, float&, float&, float&, float&, float&, float&, float&, float&, float&, float&, float&, float&);
 
         static void read(uint8_t*, unsigned int);
         static void read(float&);

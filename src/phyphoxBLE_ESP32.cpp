@@ -17,8 +17,13 @@ BLEService *PhyphoxBLE::phyphoxExperimentService;
 BLEService *PhyphoxBLE::phyphoxDataService;
 BLEDescriptor *PhyphoxBLE::myExperimentDescriptor;
 BLEDescriptor *PhyphoxBLE::myDataDescriptor;
+BLEDescriptor *PhyphoxBLE::myData1Descriptor;
+BLEDescriptor *PhyphoxBLE::myData2Descriptor;
+BLEDescriptor *PhyphoxBLE::myData3Descriptor;
 BLEDescriptor *PhyphoxBLE::myConfigDescriptor;
 BLECharacteristic *PhyphoxBLE::dataCharacteristic;
+BLECharacteristic *PhyphoxBLE::data1Characteristic;
+BLECharacteristic *PhyphoxBLE::data2Characteristic;
 BLECharacteristic *PhyphoxBLE::experimentCharacteristic;
 BLECharacteristic *PhyphoxBLE::configCharacteristic;
 BLEAdvertising *PhyphoxBLE::myAdvertising;
@@ -52,17 +57,17 @@ class MyCharCallback: public BLECharacteristicCallbacks {
     PhyphoxBLE* myServerPointer;
     void onWrite(BLECharacteristic *pCharacteristic) {
                  PhyphoxBLE::configHandlerDebug();
-      
-    }      
+
+    }
 };
 
 void PhyphoxBLE::configHandlerDebug(){
-  
+
   if(configHandler!=nullptr){
     (*configHandler)();
   }
-  
-  
+
+
 }
 
 void PhyphoxBLE::start(const char* DEVICE_NAME, uint8_t* exp_pointer, size_t len){
@@ -86,13 +91,13 @@ void PhyphoxBLE::start(const char * DEVICE_NAME)
           PhyphoxBleExperiment::View firstView;
 
           //Graph
-          PhyphoxBleExperiment::Graph firstGraph;      //Create graph which will plot random numbers over time     
-          firstGraph.setChannel(0,1);    
+          PhyphoxBleExperiment::Graph firstGraph;      //Create graph which will plot random numbers over time
+          firstGraph.setChannel(0,1);
 
-          firstView.addElement(firstGraph);       
+          firstView.addElement(firstGraph);
           defaultExperiment.addView(firstView);
-          
-          addExperiment(defaultExperiment);  
+
+          addExperiment(defaultExperiment);
     }
 
 	BLEDevice::init(DEVICE_NAME);
@@ -104,8 +109,8 @@ void PhyphoxBLE::start(const char * DEVICE_NAME)
           phyphoxBleExperimentCharacteristicUUID,
           BLECharacteristic::PROPERTY_READ   |
            BLECharacteristic::PROPERTY_WRITE |
-           BLECharacteristic::PROPERTY_NOTIFY 
-      );  
+           BLECharacteristic::PROPERTY_NOTIFY
+      );
 
   phyphoxDataService = myServer->createService(phyphoxBleDataServiceUUID);
 
@@ -113,25 +118,43 @@ void PhyphoxBLE::start(const char * DEVICE_NAME)
 	     phyphoxBleDataCharacteristicUUID,
 	     BLECharacteristic::PROPERTY_READ |
 	     BLECharacteristic::PROPERTY_WRITE |
-	     BLECharacteristic::PROPERTY_NOTIFY 
-
+	     BLECharacteristic::PROPERTY_NOTIFY
 	   );
+
+   data1Characteristic = phyphoxDataService->createCharacteristic(
+ 	     phyphoxBleData1CharacteristicUUID,
+ 	     BLECharacteristic::PROPERTY_READ |
+ 	     BLECharacteristic::PROPERTY_WRITE |
+ 	     BLECharacteristic::PROPERTY_NOTIFY
+ 	   );
+
+   data2Characteristic = phyphoxDataService->createCharacteristic(
+ 	     phyphoxBleData2CharacteristicUUID,
+ 	     BLECharacteristic::PROPERTY_READ |
+ 	     BLECharacteristic::PROPERTY_WRITE |
+ 	     BLECharacteristic::PROPERTY_NOTIFY
+ 	   );
 
     configCharacteristic = phyphoxDataService->createCharacteristic(
           phyphoxBleConfigCharacteristicUUID,
           BLECharacteristic::PROPERTY_READ   |
            BLECharacteristic::PROPERTY_WRITE |
-           BLECharacteristic::PROPERTY_NOTIFY 
+           BLECharacteristic::PROPERTY_NOTIFY
       );
 
   myExperimentDescriptor = new BLE2902();
   myDataDescriptor = new BLE2902();
+  myData1Descriptor = new BLE2902();
+  myData2Descriptor = new BLE2902();
+  myData3Descriptor = new BLE2902();
   myConfigDescriptor = new BLE2902();
 
 
   myExperimentDescriptor->setCallbacks(new MyExpCallback());
 
   dataCharacteristic->addDescriptor(myDataDescriptor);
+  data1Characteristic->addDescriptor(myData1Descriptor);
+  data2Characteristic->addDescriptor(myData2Descriptor);
   experimentCharacteristic->addDescriptor(myExperimentDescriptor);
   configCharacteristic->addDescriptor(myConfigDescriptor);
 
@@ -158,19 +181,19 @@ void PhyphoxBLE::poll(int timeout) {
 //thank you stackoverflow =)
 void PhyphoxBLE::staticStartTask(void* _this){
 	PhyphoxBLE::when_subscription_received();
-}	
+}
 
 void PhyphoxBLE::startTask()
 {
-	xTaskCreatePinnedToCore(staticStartTask, "TaskTransfer",10000, NULL,1, &TaskTransfer, 1); 
+	xTaskCreatePinnedToCore(staticStartTask, "TaskTransfer",10000, NULL,1, &TaskTransfer, 1);
 }
 
 void PhyphoxBLE::write(float& value)
 {
   /**
    * \brief Write a single float into characteristic
-     * The float is parsed to uint8_t* 
-     * because the gattServer write method 
+     * The float is parsed to uint8_t*
+     * because the gattServer write method
      * expects a pointer to uint8_t
      * \param f1 represent a float most likeley sensor data
     */
@@ -208,6 +231,34 @@ void PhyphoxBLE::write(float& f1, float& f2, float& f3, float& f4, float& f5)
   dataCharacteristic->notify();
 }
 
+void PhyphoxBLE::write(float& f1, float& f2, float& f3, float& f4, float& f5, float& f6, float& f7, float& f8, float& f9, float& f10)
+{
+  float array[5] = {f1, f2, f3, f4, f5};
+  data = reinterpret_cast<uint8_t*>(array);
+  dataCharacteristic->setValue(data,20);
+  dataCharacteristic->notify();
+  float array1[5] = {f6, f7, f8, f9, f10};
+  data = reinterpret_cast<uint8_t*>(array1);
+  data1Characteristic->setValue(data,20);
+  data1Characteristic->notify();
+}
+
+void PhyphoxBLE::write(float& f1, float& f2, float& f3, float& f4, float& f5, float& f6, float& f7, float& f8, float& f9, float& f10, float& f11, float& f12, float& f13, float& f14, float& f15)
+{
+  float array[5] = {f1, f2, f3, f4, f5};
+  data = reinterpret_cast<uint8_t*>(array);
+  dataCharacteristic->setValue(data,20);
+  dataCharacteristic->notify();
+  float array1[5] = {f6, f7, f8, f9, f10};
+  data = reinterpret_cast<uint8_t*>(array1);
+  data1Characteristic->setValue(data,20);
+  data1Characteristic->notify();
+  float array2[5] = {f11, f12, f13, f14, f15};
+  data = reinterpret_cast<uint8_t*>(array2);
+  data2Characteristic->setValue(data,20);
+  data2Characteristic->notify();
+}
+
 void PhyphoxBLE::read(uint8_t *arrayPointer, unsigned int arraySize)
 {
   uint8_t* data = configCharacteristic->getData();
@@ -239,17 +290,17 @@ void PhyphoxBLE::when_subscription_received()
     experimentSizeArray[0]=  (arrayLength >> 24);
     experimentSizeArray[1]=  (arrayLength >> 16);
     experimentSizeArray[2]=  (arrayLength >> 8);
-    experimentSizeArray[3]=  arrayLength; 
+    experimentSizeArray[3]=  arrayLength;
 
     uint8_t checksumArray[4] = {0};
     checksumArray[0]= (checksum >> 24) & 0xFF;
-    checksumArray[1]= (checksum >> 16) & 0xFF;  
+    checksumArray[1]= (checksum >> 16) & 0xFF;
     checksumArray[2]= (checksum >> 8) & 0xFF;
-    checksumArray[3]= checksum & 0xFF; 
+    checksumArray[3]= checksum & 0xFF;
 
     copy(phyphox, phyphox+7, header);
     copy(experimentSizeArray, experimentSizeArray+ 4, header + 7);
-    copy(checksumArray, checksumArray +  4, header +11); 
+    copy(checksumArray, checksumArray +  4, header +11);
     experimentCharacteristic->setValue(header,sizeof(header));
     experimentCharacteristic->notify();
     for(size_t i = 0; i < exp_len/20; ++i){
@@ -258,16 +309,16 @@ void PhyphoxBLE::when_subscription_received()
         experimentCharacteristic->notify();
 		delay(1);
 	}
-  
+
 	if(exp_len%20 != 0){
 		const size_t rest = exp_len%20;
 		uint8_t slice[rest];
 		copy(exp + exp_len - rest, exp + exp_len, slice);
 		experimentCharacteristic->setValue(slice,sizeof(slice));
-		experimentCharacteristic->notify();        
+		experimentCharacteristic->notify();
 		delay(1);
 	}
- 
+
 
 	myAdvertising->start();
 
@@ -276,7 +327,7 @@ void PhyphoxBLE::when_subscription_received()
 }
 void PhyphoxBLE::addExperiment(PhyphoxBleExperiment& exp)
 {
-	char buffer[4000] =""; //this should be reworked 
+	char buffer[4000] =""; //this should be reworked
 	exp.getBytes(buffer);
 	memcpy(&EXPARRAY[0],&buffer[0],strlen(buffer));
 	p_exp = &EXPARRAY[0];
@@ -288,7 +339,7 @@ void PhyphoxBLE::begin(HardwareSerial* hwPrint)
 {
 	printer = hwPrint;
       	if(printer)
-		printer->begin(115200);       
+		printer->begin(115200);
 }
 */
 #endif
